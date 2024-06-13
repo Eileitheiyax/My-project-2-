@@ -2,15 +2,21 @@ using UnityEngine;
 
 public class ThirdPersonShooter : MonoBehaviour
 {
-    public GameObject bulletPrefab; // Mermi prefab'ý
-    public Transform firePoint; // Merminin çýkýþ noktasý
-    public float bulletSpeed = 20f; // Merminin hýzý
-    public float fireRate = 0.5f; // Ateþ etme sýklýðý
-    private float nextFireTime = 0f; // Bir sonraki ateþ etme zamaný
+    public GameObject bulletPrefab; 
+    public Transform firePoint; 
+    public float bulletSpeed = 20f; 
+    public float fireRate = 0.5f; 
+    private float nextFireTime = 0f;
+
+    private GameManager gameManager;
+    private void Start()
+    {
+        gameManager = GameManager.Instance;
+    }
 
     void Update()
     {
-        // Mouse sol tuþu veya belirli bir tuþa basýldýðýnda ateþ et
+        
         if (Input.GetButton("Fire1") && Time.time >= nextFireTime)
         {
             Shoot();
@@ -20,13 +26,14 @@ public class ThirdPersonShooter : MonoBehaviour
 
     void Shoot()
     {
-        // Mermiyi oluþtur
+        
         GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
         Rigidbody rb = bullet.GetComponent<Rigidbody>();
-        rb.velocity = firePoint.forward * bulletSpeed;
+        rb.velocity = firePoint.transform.forward * bulletSpeed;
 
-        // Mermiyi belirli bir süre sonra yok et
+        gameManager.audioManager.PlayOneShotAudio(0); ;
         Destroy(bullet, 2.0f);
     }
+
 }
 

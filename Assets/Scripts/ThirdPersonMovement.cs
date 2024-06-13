@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,10 +8,13 @@ public class ThirdPersonMovement : MonoBehaviour
     public Transform cam;
 
     public float speed = 6f;
-
+    public float gravity = -9.81f;
+    public float jumpHeight = 1.5f;
     public float turnSmoothTime = 0.1f;
-    float turnSmoothVelocity;
+    public float fallThreshold = -10f; // Haritadan düşme yüksekliği
 
+    private float turnSmoothVelocity;
+    private Vector3 velocity;
 
     void Update()
     {
@@ -29,5 +32,38 @@ public class ThirdPersonMovement : MonoBehaviour
             controller.Move(moveDir.normalized * speed * Time.deltaTime);
         }
 
+        // Yerçekimi etkisi
+        if (controller.isGrounded && velocity.y < 0)
+        {
+            velocity.y = -2f;  // Küçük negatif değer, sürekli yerle temasta kalmasını sağlar
+        }
+
+        if (Input.GetButtonDown("Jump") && controller.isGrounded)
+        {
+            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+        }
+
+        velocity.y += gravity * Time.deltaTime;
+        controller.Move(velocity * Time.deltaTime);
+
+        // Karakter haritadan düştü mü kontrol et
+        if (transform.position.y < fallThreshold)
+        {
+            BackToRespawn();
+        }
+    }
+
+    public void BackToRespawn()
+    {
+        StartCoroutine(RespawnCoroutine());
+    }
+
+    private IEnumerator RespawnCoroutine()
+    {
+        controller.enabled = false;
+        transform.position = Vector3.zero;
+        yield return null; // Bir frame bekle
+        controller.enabled = true;
+        velocity = Vector3.zero;  // Düşüş hızını sıfırlamak için
     }
 }

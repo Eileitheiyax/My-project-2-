@@ -3,11 +3,13 @@ using UnityEngine;
 public class Health : MonoBehaviour
 {
     public int maxHealth = 100;
-    private int currentHealth;
+    public int currentHealth;
+    private GameManager gameManager;
 
     void Start()
     {
         currentHealth = maxHealth;
+        gameManager = GameManager.Instance;
     }
 
     public void TakeDamage(int amount)
@@ -21,9 +23,7 @@ public class Health : MonoBehaviour
 
     void Die()
     {
-        // Hedef yok olur
+        gameManager.scoreManager.AddScore(10); 
         Destroy(gameObject);
     }
 }
-
-
